@@ -3,7 +3,10 @@ import Utilities.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Image;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -14,6 +17,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.logging.FileHandler;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,9 +29,13 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 public class TermDepositApplication {
 	private JFrame frame;
 	private JPanel panel;
@@ -58,6 +68,7 @@ public class TermDepositApplication {
 	private UploadFile filehandler;
 	TermDepositApplicationService tdrService;
 	private JButton updatebtn;
+	private JButton btnViewFile;
 	
 	public TermDepositApplication(AccountDTO accountDetails)
 	{
@@ -221,7 +232,7 @@ public class TermDepositApplication {
 
 			}
 		});
-		btnSelectFile.setBounds(28, 501, 89, 23);
+		btnSelectFile.setBounds(28, 501, 96, 23);
 		panel.add(btnSelectFile);
 		
 		JLabel lblMaxMbjpgjpegpngpdf = new JLabel("Max(5 MB) *JPG,*JPEG,*PNG,*PDF");
@@ -282,13 +293,21 @@ public class TermDepositApplication {
 
 	public void UpdateTDA(final TermDepositApplicationDTO TDRAppDto)
 	{
-		
 		updatebtn = new JButton("Update");
 		updatebtn.setBounds(471, 501, 117, 23);
 		panel.add(updatebtn);
 		panel.repaint();
+
 		final AccountDTO accdto=TDRAppDto.GetAccountDTO();
 		
+		btnViewFile = new JButton("View File");
+		btnViewFile.setBounds(249, 501, 89, 23);
+		panel.add(btnViewFile);
+		btnViewFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				filehandler.viewFile(TDRAppDto);
+			}
+		});
 		accountNoField.setText(TDRAppDto.GetAccountNo());
 		accountTitleField.setText(TDRAppDto.GetAccountTitle());
 		branchCodeField.setText(accdto.GetBranchCode());
@@ -365,9 +384,6 @@ public class TermDepositApplication {
 				}
 			}
 			else{
-
-					
-			
 			TermDepositApplicationDTO TDADTO = new TermDepositApplicationDTO();
 			TDADTO.SetApplicationDate(dateField.getText());
 			TDADTO.SetSelectedTenure((ComboItem) tenureComboBox.getSelectedItem());
@@ -378,6 +394,7 @@ public class TermDepositApplication {
 			TDADTO.SetPricipalFundCrAccount(principalFundCrField.getText());
 			TDADTO.SetProfitNomAccount(profitNomAccountField.getText());
 			TDADTO.SetAccountNo(accdto.GetAccountNo());
+			TDADTO.SetAccountID(accdto.GetAccountID());
 			TDADTO.SetApplicationNo(TDRAppDto.GetApplicationNo());
 			if(filehandler.path != null)
 			{
@@ -398,13 +415,13 @@ public class TermDepositApplication {
 				}
 			}
 			
-			int status= tdrService.updateTDRApplication(TDADTO);
+			int status= tdrService.updateTDRApplication(TDADTO,TDRAppDto.GetTDRAmount());
 			if(status==-1)
 			{
 				JOptionPane.showMessageDialog(frame, "Updated unsuccessful","Unsuccessful",JOptionPane.ERROR_MESSAGE);
 			}
 			else{
-				JOptionPane.showMessageDialog(frame, "Application Updated Successfully \n Application ID = "+TDRAppDto,"Successful",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(frame, "Application Updated Successfully \n Application ID = "+TDRAppDto.GetApplicationNo(),"Successful",JOptionPane.INFORMATION_MESSAGE);
 				frame.dispose();
 			}
 			}
@@ -418,7 +435,6 @@ public class TermDepositApplication {
 		saveButton.setBounds(471, 501, 118, 23);
 		panel.add(saveButton);
 		panel.repaint();
-		
 		accountNoField.setText(accountDTO.GetAccountNo());
 		accountTitleField.setText(accountDTO.GetAccountTitle());
 		branchCodeField.setText(accountDTO.GetBranchCode());
@@ -427,6 +443,9 @@ public class TermDepositApplication {
 		currencyField.setText(accountDTO.GetCurrency());
 		profitNomAccountField.setText(accountDTO.GetAccountNo());
 		principalFundCrField.setText(accountDTO.GetAccountNo());
+		
+
+
 		saveButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent saveButtonClicked) {
 			if(totalAmountField.getText().isEmpty())
@@ -483,20 +502,20 @@ public class TermDepositApplication {
 			TDADTO.SetPricipalFundCrAccount(principalFundCrField.getText());
 			TDADTO.SetProfitNomAccount(profitNomAccountField.getText());
 			TDADTO.SetAccountNo(accountDTO.GetAccountNo());
-			
+			TDADTO.SetAccountID(accountDTO.GetAccountID());
 			try {
 				TDADTO.SetFiledata(filehandler.readFileData(file), file.getName());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			int applicationId= tdrService.insertTDRApplication(TDADTO);
-			if(applicationId==-1)
+			String applicationNo= tdrService.insertTDRApplication(TDADTO);
+			if(applicationNo == null)
 			{
 				JOptionPane.showMessageDialog(frame, "Insert unsuccessful","Unsuccessful",JOptionPane.ERROR_MESSAGE);
 			}
 			else{
-				JOptionPane.showMessageDialog(frame, "Application Created Successfully \n Application ID = "+applicationId,"Successful",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(frame, "Application Created Successfully \n Application No = "+applicationNo,"Successful",JOptionPane.INFORMATION_MESSAGE);
 				frame.dispose();
 			}
 			}

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Point;
 
 import javax.swing.JButton;
@@ -38,7 +39,7 @@ public class TermDepositSearch {
 		}
 		
 	}
-	
+
 	public void CreateWindow() throws SQLException 
 	{
 		final JFrame frame = new JFrame("Modify Term Deposit");
@@ -53,9 +54,9 @@ public class TermDepositSearch {
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
 
-		String[] columnNames = {"Account No", "TDR Application No", "Tenure",  "Amount", "Maturity Date","Application Date", "Principal Fund C/r Account","Profit Nom Account"};
+		String[] columnNames = {"Account No", "Amount", "Application No",  "Tenure", "Action at Maturity","Maturity_date"};
 		
-	
+
 
 		Object[][] data = TDRSS.GetUnauthorizedApplication();
 		
@@ -84,7 +85,7 @@ public class TermDepositSearch {
 		        int row = table.rowAtPoint(point);
 		        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
 					//JOptionPane.showMessageDialog(frame, "Amount is required!","row = "+table.getValueAt(row, 0).toString() ,JOptionPane.ERROR_MESSAGE);
-		        	int applicationNo= Integer.parseInt(table.getValueAt(row, 1).toString());
+		        	String applicationNo= table.getValueAt(row, 2).toString();
 		        	TermDepositApplicationDTO TDRAppDto = TDRSS.GetTDRAppDetails(applicationNo);
 		        	TermDepositApplication TDRApplication= new TermDepositApplication(TDRAppDto);
 		        	

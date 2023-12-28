@@ -15,13 +15,18 @@ public class TermDepositApplicationDTO {
 	private String profitNomAccount;
 	private String fileName;
 	private byte[] fileData;
+	private String accountID;
+	
 	private AccountDTO tdrAccount;
 	
 	public void SetApplicationDate(String applicationDate)
 	{
 		this.applicationDate = applicationDate;
 	}
-	
+	public void SetAccountID(String accountID)
+	{
+		this.accountID = accountID;
+	}
 	public void SetSelectedTenure(ComboItem selectedTenure)
 	{
 		this.selectedTenure = selectedTenure;
@@ -93,7 +98,10 @@ public class TermDepositApplicationDTO {
 	{
 		return selectedMaturityAction;
 	}
-	
+	public String GetAccountID()
+	{
+		return this.accountID ;
+	}
 	public String GetAccountTitle()
 	{
 		return accountTitle;

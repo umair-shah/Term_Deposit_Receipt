@@ -2,8 +2,8 @@ package TermDeposit;
 
 public class AccountDTO {
 	private boolean result;
-	
 	private String accountNo;
+	private String accountID;
 	private String accountTitle;
 	private String branchCode;
 	private String branchName;
@@ -16,7 +16,10 @@ public class AccountDTO {
 	{
 		this.result = result;
 	}
-	
+	public void SetAccountID(String accountID)
+	{
+		this.accountID = accountID;
+	}
 	public void SetAccountNo(String accountNo)
 	{
 		this.accountNo = accountNo;
@@ -56,7 +59,10 @@ public class AccountDTO {
 	{
 		this.accountStatus = accountStatus;
 	}
-	
+	public String GetAccountID()
+	{
+		return this.accountID;
+	}
 	public boolean GetResult()
 	{
 		return result;
